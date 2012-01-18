@@ -55,6 +55,7 @@ public:
     void describe();
     void set_row(row * r);
     void exchange_for_rowset(into_type_ptr const & i);
+    void reset();
 
     // for diagnostics and advanced users
     // (downcast it to expected back-end statement class)
@@ -190,6 +191,8 @@ public:
     {
         impl_->exchange_for_rowset(i);
     }
+
+    void reset()          { impl_->reset();  }
 
     // for diagnostics and advanced users
     // (downcast it to expected back-end statement class)

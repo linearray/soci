@@ -68,6 +68,24 @@ void sqlite3_statement_backend::prepare(std::string const & query,
     databaseReady_ = true;
 }
 
+void sqlite3_statement_backend::reset()
+{
+    if (stmt_)
+    {
+        int res = sqlite3_reset(stmt_);
+        if (res != SQLITE_OK)
+        {
+            char const* zErrMsg = sqlite3_errmsg(session_.conn_);
+
+            std::ostringstream ss;
+            ss << "sqlite3_statement_backend::reset: "
+               << zErrMsg;
+            throw soci_error(ss.str());
+        }
+        databaseReady_ = true;
+    }
+}
+
 // sqlite3_reset needs to be called before a prepared statment can
 // be executed a second time.
 void sqlite3_statement_backend::reset_if_needed()

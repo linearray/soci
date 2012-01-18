@@ -258,6 +258,40 @@ void test5()
     std::cout << "test 5 passed" << std::endl;
 }
 
+// Test reused prepared statement which would lock the database for writing without reset.
+// This happens only when two different connections to the database are used
+// where the first is "assigned" to the prepared statement and the second one
+// is used for writing.
+void test6()
+{
+    {
+        // A file for the database has to be used as in memory databases
+        // can not be shared throughout connections.
+        session sql1(backEnd, "test6.db");
+        session sql2(backEnd, "test6.db");
+
+        test4_table_creator tableCreator(sql1);
+
+        sql1 << "insert into soci_test(name) values('john')";
+        sql1 << "insert into soci_test(name) values('james')";
+
+        {
+            int key1;
+            std::string name1;
+            statement st = (sql1.prepare << "select * from soci_test", into(key1), into(name1));
+
+            st.execute(true);
+            assert(name1 == "john");
+            // finishes the query so that writing is possible again
+            st.reset();
+
+            std::string name2 = "james";
+            sql2 << "delete from soci_test where name = :name", use(name2);
+        }
+    }
+    std::cout << "test 6 passed" << std::endl;
+}
+
 // DDL Creation objects for common tests
 struct table_creator_one : public table_creator_base
 {
@@ -359,6 +393,7 @@ int main(int argc, char** argv)
         test3();
         test4();
         test5();
+        test6();
 
         std::cout << "\nOK, all tests passed.\n\n";
 

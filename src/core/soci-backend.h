@@ -147,6 +147,7 @@ public:
 
     virtual void alloc() = 0;
     virtual void clean_up() = 0;
+    virtual void reset(){}
 
     virtual void prepare(std::string const& query, statement_type eType) = 0;
 

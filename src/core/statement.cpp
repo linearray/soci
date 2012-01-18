@@ -705,6 +705,11 @@ void statement_impl::dec_ref()
     }
 }
 
+void statement_impl::reset()
+{
+    backEnd_->reset();
+}
+
 standard_into_type_backend *
 statement_impl::make_into_type_backend()
 {
